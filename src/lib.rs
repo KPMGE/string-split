@@ -2,15 +2,15 @@
 // must live for at least as long as the StrSplit struct does, so we never point to an invalid
 // pointer
 #[derive(Debug)]
-struct StrSplit<'a> {
+struct StrSplit<'a, 'b> {
     remainder: Option<&'a str>,
-    delimiter: &'a str
+    delimiter: &'b str
 }
 
 // here, we're saying that for any type, the haystack and the delimiter lifetimes
 // must be at least as big as the StrSplit lifetime
-impl<'a> StrSplit<'a> {
-    pub fn new(haystack: &'a str, delimiter: &'a str) -> Self {
+impl<'a, 'b> StrSplit<'a, 'b> {
+    pub fn new(haystack: &'a str, delimiter: &'b str) -> Self {
         Self {
             remainder: Some(haystack),
             delimiter
@@ -20,7 +20,7 @@ impl<'a> StrSplit<'a> {
 
 // Here we're saying the same as above, but now, the string inside the 
 // iterator Item is tied to the lifetime of the StrSplit struct
-impl<'a> Iterator for StrSplit<'a> {
+impl<'a, 'b> Iterator for StrSplit<'a, 'b> {
     type Item = &'a str;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -38,6 +38,13 @@ impl<'a> Iterator for StrSplit<'a> {
         }
     }
 }
+
+pub fn until_char(s: &str, c: char) -> &str {
+    let delim = format!("{}", c);
+    StrSplit::new(s, &delim)
+        .next()
+        .expect("strsplit always gives at least one result")
+} 
 
 #[test]
 fn works() {
