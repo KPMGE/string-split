@@ -1,9 +1,14 @@
+// here we're saying that, both the remainder and the delimiter pointers
+// must live for at least as long as the StrSplit struct does, so we never point to an invalid
+// pointer
 #[derive(Debug)]
 struct StrSplit<'a> {
     remainder: Option<&'a str>,
     delimiter: &'a str
 }
 
+// here, we're saying that for any type, the haystack and the delimiter lifetimes
+// must be at least as big as the StrSplit lifetime
 impl<'a> StrSplit<'a> {
     pub fn new(haystack: &'a str, delimiter: &'a str) -> Self {
         Self {
@@ -13,6 +18,8 @@ impl<'a> StrSplit<'a> {
     }
 }
 
+// Here we're saying the same as above, but now, the string inside the 
+// iterator Item is tied to the lifetime of the StrSplit struct
 impl<'a> Iterator for StrSplit<'a> {
     type Item = &'a str;
 
